@@ -29,9 +29,12 @@
 #include "sys_timer.h"
 /* Private define ------------------------------------------------------------*/
 #define Default_Warm_Temperature  55
-#define Boil_Temperature 97
-#define Indoor_Temperature 30
-#define Limiting_Temperature 105
+#define Boil_Temperature          97
+#define Indoor_Temperature        30
+#define Limiting_Temperature      105
+#define MAX_Temperature           150
+#define Prejudge_Value1            3 
+#define Prejudge_Value2            5 
 #define ON 1
 #define OFF 0
 /* Private typedef -----------------------------------------------------------*/
@@ -351,13 +354,12 @@ void set_dp_boil_value(bool value)
  */
 void set_kettle_keep_warm_temper(int value)
 {
-    if(44 < value < 91) {
-        tuya_hal_mutex_lock(mutex);
-        temp_set_s.value = value;
-        kettle_work_information.warm_temperature = value;
-        tuya_hal_mutex_unlock(mutex);
-        PR_DEBUG("set keep warm temper:%d",value);
-    }
+
+    tuya_hal_mutex_lock(mutex);
+    temp_set_s.value = value;
+    kettle_work_information.warm_temperature = value;
+    tuya_hal_mutex_unlock(mutex);
+    PR_DEBUG("set keep warm temper:%d",value);
 }
 /**
  * @Function: set_kettle_work_status
@@ -543,13 +545,13 @@ void app_kettle_thread(void)
         break;
         //clear water keep warm
         case keep_warm_mode2: {
-            if(get_water_temperature() > (get_keep_wram_temperature() - 3)) {  //cur_temp > set temper  close the heating
+            if(get_water_temperature() > (get_keep_wram_temperature() - Prejudge_Value1)) {  //cur_temp > set temper  close the heating
                 relay_set(OFF);
                 led1_set(OFF);
                 led2_set(ON);  
                 state_led_set(OFF); 
                 PR_DEBUG("keep_warm_mode2 relay_set 0");
-            }else if(get_water_temperature() < (get_keep_wram_temperature() - 5)) { //cur_temp < set temper  open the heating
+            }else if(get_water_temperature() < (get_keep_wram_temperature() - Prejudge_Value2)) { //cur_temp < set temper  open the heating
                 relay_set(ON);
                 led1_set(OFF);
                 led2_set(ON);  
@@ -597,8 +599,8 @@ void get_temper_timer_cb(void)
 {
         static int last_temper = 0;
         last_temper = cur_temper_get();
-        if(last_temper > 150) {
-            last_temper = 150;
+        if(last_temper > MAX_Temperature) {
+            last_temper = MAX_Temperature;
         }
         else if(last_temper < 0) {
             last_temper = 0;
