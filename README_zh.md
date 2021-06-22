@@ -85,7 +85,7 @@
 
 ## 详细说明文档 
 
-+ [涂鸦 Demo 中心](https://developer.tuya.com/demo)  
++ [涂鸦 Demo 中心]( https://developer.tuya.com/cn/demo/smart-kettle )  
 
 ## 技术支持 
 

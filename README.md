@@ -85,7 +85,7 @@ Important functions: device_init()
 
 ## Related documentation 
 
-+ [Tuya Demo Center](https://developer.tuya.com/demo)  
++ [Tuya Demo Center]( https://developer.tuya.com/cn/demo/smart-kettle )  
 
 
 
